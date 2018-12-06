@@ -14,7 +14,7 @@ class tPool:
         self.noThreadsEvent()
 
     def createThreadBlock(self, function=None):
-        self.qtdThreads += threadBlocklen
+        self.qtdThreads += self.threadBlocklen
 
         if function is None:
             return [threading.Thread(target=self.work) for i in range(self.threadBlocklen)]
