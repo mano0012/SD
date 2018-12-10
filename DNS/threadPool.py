@@ -14,6 +14,7 @@ class tPool:
         self.noThreadsEvent()
 
     def createThreadBlock(self, function=None):
+        print("CREATING BLOCK")
         self.qtdThreads += self.threadBlocklen
 
         if function is None:
@@ -29,6 +30,7 @@ class tPool:
             if self.qtdThreads < self.maxThreads:
                 self.noThreadsEvent()
             else:
+                print("MAX THREADS")
                 while self.freeThreadQueue.empty():
                     pass
 
@@ -48,7 +50,7 @@ class tPool:
 
         return threading.Thread(target=function)
 
-    def addQueue(self, thread):
-        self.freeThreadQueue.put(thread)
+    def repopulate(self):
+        self.freeThreadQueue.put(self.createThread())
 
     # TODO : Implementar um controle de concorrencia na fila de threads

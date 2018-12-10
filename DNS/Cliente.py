@@ -1,90 +1,135 @@
 import socket
+import json
 import pickle
-import threading
 
-class Cliente:
-	def __init__(self):
-		self.s = None
+DNS_IP = "127.0.0.1"
+DNS_PORT = 10001
 
-	def newSocket(self):
-		self.s.close()
-		self.criaSocket()
-		
-	def criaSocket(self):
-		self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	
-	
-	def requestAdress(self, servidor):
-		self.setCamposSocket('127.0.0.1',9996)
-		
-		if self.s is None: self.criaSocket()
-		else: self.newSocket()
-		
-		self.conect()
-		
-		if servidor is None: msg = input("DIGITE O SERVIDOR: ")
-		else: msg = servidor
-		
-		if msg == "exit": return
-		
-		msgSerializada = pickle.dumps(msg)
+class Client:
+    def __init__(self):
+        self.sock = None
+        self.ip = "127.0.0.1"
+        self.port = 9992
+        self.serviceList = list()
+        self.serviceAddr = None
 
-		self.s.send(msgSerializada)
-		
-		msgSerializada = self.s.recv(1024)
-	
-		msg = pickle.loads(msgSerializada)
-		
-		print ("Resposta do server: ",msg)
-		
-		self.host, self.port = msg
-		
-		self.newSocket()
-		
-		self.conect()
+        print("CLIENTE CRIADO")
 
-	def comunica(self):
-		while True:
-			print ("ENTROU")
-			msg = input("Digite sua mensagem: ")
-			
-			if msg == 'exit': break
-			elif msg == 'mySQL' or msg == 'HTTP': self.requestAdress(msg)
-			else:
-				print ("MSG QUE IRA PRO DNS: ",msg)
-			
-				msgSerializada = pickle.dumps(msg)
 
-				self.s.send(msgSerializada)
-				
-				msgSerializada = self.s.recv(1024)
-				
-				msg = pickle.loads(msgSerializada)
-				
-				print ("Resposta do server: ", msg)
 
-	def setCamposSocket(self, h, p):
-		self.host = h
-		self.port = p
-		self.dest = (self.host, self.port)
+    def createSocketUDP(self):
+        self.sock = socket.socket(socket.AF_INET,  # Internet
+                             socket.SOCK_DGRAM)
 
-	def conect(self):
-		self.s.connect(self.dest)
-		
-	def exit(self):
-		self.s.close()
-		
-	def change(self, dest):
-		self.s.connect(dest)
-			
-cliente = Cliente()
+        self.sock.bind((self.ip, self.port))
 
-cliente.requestAdress(None)
+    def closeSocket(self):
+        try:
+            self.sock.close()
+        except:
+            print("DEU NAO")
+            pass
 
-cliente.comunica()
+    def createSocketTCP(self):
+        self.sock = socket.socket(socket.AF_INET,  # Internet
+                             socket.SOCK_STREAM)  # TCP
 
-cliente.change(('127.0.0.1',9997))
+    def run(self):
+        op = 1
 
-print ("TROCOU")
+        self.createSocketUDP()
 
-cliente.exit()
+        while op != 0:
+            op = self.getService()
+
+            print("Serviços disponíveis")
+
+            for i in range(len(self.serviceList)):
+                print(i+1, "- ", self.serviceList[i])
+
+            print("0 - Sair")
+
+            op = int(input("Selecione o serviço: "))
+
+            while op < 0 or op > len(self.serviceList):
+                op = int(input("Serviço invalido, digite novamente: "))
+
+            self.selectService(op)
+
+    def connect(self):
+        self.sock.connect(self.serviceAddr)
+
+        print("Conectado")
+
+        msg = ""
+
+        while msg != "exit":
+            msg = input("> ")
+
+            if msg != "exit":
+                # Request
+                self.sendTCP(self.prepareMsg(msg))
+
+                "Reply"
+                msg = self.loadMessage(self.sock.recv(1024))
+                print(msg)
+
+        print("\n")
+
+    def selectService(self, service):
+        if service == 0:
+            print("GOODBYE!")
+        else:
+            self.sendUDP((DNS_IP, DNS_PORT), self.prepareMsg({"con":"CLIENTE", "type":self.serviceList[service-1]}))
+            data, _ = self.sock.recvfrom(1024)
+
+            self.serviceAddr = self.loadMessage(data)
+
+            self.closeSocket()
+
+            self.createSocketTCP()
+
+            self.connect()
+
+    def getService(self):
+        self.closeSocket()
+
+        self.createSocketUDP()
+
+        self.sendUDP((DNS_IP, DNS_PORT), self.prepareMsg("getServices"))
+        data, _ = self.sock.recvfrom(1024)
+
+        self.serviceList = self.loadMessage(data)
+
+    def convertJson(self, message):
+        try:
+            msg = json.dumps(message)
+            return msg
+        except:
+            return message
+
+    def loadJson(self, message):
+        try:
+            msg = json.loads(message)
+            return msg
+        except:
+            return message
+
+    def loadMessage(self, message):
+        return self.loadJson(pickle.loads(message))
+
+    def prepareMsg(self, msg):
+        jsonMsg = self.convertJson(msg)
+
+        serializedMsg = pickle.dumps(jsonMsg)
+
+        return serializedMsg
+
+    def sendTCP(self, serializedMsg):
+        self.sock.send(serializedMsg)
+
+    def sendUDP(self, host, serializedMessage):
+        self.sock.sendto(serializedMessage, host)
+
+cliente = Client()
+cliente.run()
