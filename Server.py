@@ -66,6 +66,9 @@ class Server:
         self.createSocketUDP()
         
         self.sendUDP((DNS_IP, DNS_PORT), self.prepareMsg("registerServer"))
+        data, addr = self.sock.recvfrom(1024)
+        message = self.loadMessage(data)
+        print(message)
 
     def sendTCP(self, serializedMsg):
         self.sock.send(serializedMsg)
