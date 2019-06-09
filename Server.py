@@ -5,7 +5,7 @@ import threadPool
 
 MAX_THREADS = 100
 THREAD_BLOCK = 10
-DNS_IP = "172.31.88.8-ip-172-31-88-8.ec2.internal"
+DNS_IP = "172.31.88.8"
 DNS_PORT = 10001
 
 class Server:
