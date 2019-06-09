@@ -5,13 +5,13 @@ import threadPool
 
 MAX_THREADS = 100
 THREAD_BLOCK = 10
-DNS_IP = "127.0.0.1"
+DNS_IP = "172.31.88.8-ip-172-31-88-8.ec2.internal"
 DNS_PORT = 10001
 
 class Server:
     def __init__(self):
-        self.ip = "127.0.0.1"
-        self.port = 10002
+        self.ip = "172.31.85.113"
+        self.port = 11001
 
         self.sock = None
 
