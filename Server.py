@@ -34,7 +34,7 @@ class Server:
                 print(msg["lockId"])
                 print(msg["code"])
 
-                if (msg["lockId"] == 5 and msg["code"] == "15"):
+                if (msg["lockId"] == 5):
                     connection.send(self.prepareMsg("Authorized"))
                 else: connection.send(self.prepareMsg("Unauthorized"))
             except:
