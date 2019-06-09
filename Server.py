@@ -7,6 +7,7 @@ MAX_THREADS = 100
 THREAD_BLOCK = 10
 DNS_IP = "172.31.88.8"
 DNS_PORT = 10001
+DNS_RESOLVER = "ip-172-31-88-8.ec2.internal"
 
 class Server:
     def __init__(self):
@@ -17,13 +18,17 @@ class Server:
 
         self.threads = threadPool.tPool(self.run, MAX_THREADS, THREAD_BLOCK)
 
-        self.register()
+        #self.register()
 
-        self.closeSocket()
+        #self.closeSocket()
     
-        self.createSocketTCP()
+        #self.createSocketTCP()
 
-        print("Server is set up.")
+        #print("Server is set up.")
+        data = socket.gethostbyname_ex(DNS_RESOLVER_DNS)
+        ipaddr = data[2]
+        print(ipaddr)
+        
 
     def run(self, connection):
         while True:
@@ -120,4 +125,4 @@ class Server:
         self.sock.sendto(serializedMessage, host)
 
 sv = Server()
-sv.waitClient()
+#sv.waitClient()
