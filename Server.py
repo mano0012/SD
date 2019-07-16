@@ -52,6 +52,8 @@ class Server:
                 print("End of connection")
                 break
 
+        self.threads.repopulate()
+
     def waitClient(self):
         while True:
             con, client = self.sock.accept()
@@ -99,7 +101,7 @@ class Server:
                                   socket.SOCK_STREAM)  # TCP
 
         self.sock.bind((self.ip, self.port))
-        self.sock.listen(1)
+        self.sock.listen(5)
 
     def closeSocket(self):
         try:
