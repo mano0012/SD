@@ -24,48 +24,52 @@ class DNS:
 
         self.threads = threadPool.tPool(self.getAddress, MAX_THREADS, THREAD_BLOCK)
 
+
+        self.totalSlots = {"A": {"Vagas": {"1": 10, "2":10, "3":10} },"B": {"Vagas": {"1": 10, "2":10, "3":10} }, "C": {"Vagas": {"1": 10, "2":10, "3":10} } }
+
         print("NameService is set up")
 
     def run(self):
         while True:
             data, addr = self.s.recvfrom(1024)
 
-            print(addr)
-
             t = self.threads.getThread([data, addr])
 
             t.start()
 
-    def handleServer(self, address):
+    def handleServer(self, addr):
         while(True):
             if(self.lock == False):
                 break
 
         self.lock = True
 
-        self.addQueueSv(address)
-        self.servers.append(address)
+        self.addQueueSv(addr)
+        self.servers.append(addr)
 
-        self.sendToHost(address, self.servers)
+        self.sendToHost(addr, self.servers)
 
         self.lock = False
 
     #Terminar getAddress
-    def getAddress(self, data, address):
+    def getAddress(self, data, addr):
         message = self.loadMessage(data)
-
+        
         print("MESSAGE: " + message)
 
         if message == "registerServer":
-            print("Adding ", address, " server.")
-            self.handleServer(address)
+            print("Adding ", addr, " server.")
+            self.handleServer(addr)
         elif message == "getServerList":
             serverList = pickle.dumps(list(self.serverList.queue))
-            self.s.sendto(serverList, address)
+            self.s.sendto(serverList, addr)
+        elif message == "getSlots":
+            slots = self.enc.prepareMsg(self.totalSlots)
+            self.s.sendto(slots, addr)
         else:
             svAddr = self.getServerAddress()
 
-            self.sendToHost(address, svAddr)
+            self.sendToHost(addr, svAddr)
 
         self.threads.repopulate()
 

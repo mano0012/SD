@@ -19,22 +19,18 @@ TESTE = False
 class Server:
     def __init__(self):
         #self.ip = "172.31.85.113"
+        self.ip = "127.0.0.1"
         self.enc = Enc.Enc()
         self.store = Store.Store()
 
         self.store.setEncoder(self.enc)
 
-        self.ip = "127.0.0.1"
-        if TESTE:
-            self.port = 11000
-        else:
-            self.port = 11001
+        #self.port = 11000
+        self.port = 11001
         #self.port = 11002
         #self.port = 11003
 
         self.serverList = []
-        self.criticalLock = False
-        self.criticalQueue = queue.Queue()
 
         self.serverSock = None
 
@@ -46,10 +42,7 @@ class Server:
     
         self.createSocketTCP()
 
-        self.lotation = 0
-
         print("Server is set up.")
-        self.store.doTrick()
         
     def handleServer(self, msg):
         print("SERVER HANDLER")
@@ -58,7 +51,6 @@ class Server:
         address = (ip, port)
         self.serverList.append(address)
         self.store.setServerList(self.serverList)
-        print(self.serverList)
 
     def handleSlots(self, msg):
         return self.store.handleSlot(msg)
@@ -77,6 +69,10 @@ class Server:
             try:
                 msg = self.getMessage(connection)
             
+                if msg["type"] == "Server":
+                    self.handleServer(msg)
+                    break
+
                 print("MENSAGEM " + str(msg))
                 if msg["type"] == "Server":
                     self.handleServer(msg)
@@ -96,12 +92,10 @@ class Server:
                 connection.shutdown(2)
                 connection.close()
 
-        print("CLOSING CONNECTION")
         connection.shutdown(2)
         connection.close()
 
         self.threads.repopulate()
-        print("FINALIZOU A THREAD")
 
     def waitClient(self):
         while True:
@@ -130,7 +124,13 @@ class Server:
             message = self.enc.loadMessage(data)
             self.serverList = message[0:len(message) - 1]
             self.store.setServerList(self.serverList)
-            print("SENDING REGISTER")
+            
+            if len(self.serverList) == 0:
+                self.sendUDP((DNS_IP, DNS_PORT), self.enc.prepareMsg("getSlots"))
+                data, _ = self.sock.recvfrom(1024)
+                totalSlots = self.enc.loadMessage(data)
+                self.store.setLotation(totalSlots)
+
             for server in self.serverList:
                 msg = {"type": "Server", "ip": str(self.ip), "port": str(self.port) }
                 self.store.connect(server)
@@ -144,6 +144,8 @@ class Server:
     def createSocketTCP(self):
         self.sock = socket.socket(socket.AF_INET,  # Internet
                                   socket.SOCK_STREAM)  # TCP
+
+        #self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
         self.sock.bind((self.ip, self.port))
         self.sock.listen(5)

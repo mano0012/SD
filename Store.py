@@ -12,18 +12,14 @@ TESTE = False
 class Store:
     def __init__(self):
         self.enc = None
-        if TESTE:
-            self.sockCliente = MySocket.MySocket("127.0.0.1", 20000)
-            self.data = json.loads('{"A": {"Vagas": {"1": 30, "2":30, "3":30} },"B": {"Vagas": {"1": 6, "2":30} }, "C": {"Vagas": {"1": 10, "2":10, "3":10} } }')
-        else:
-            self.sockCliente = MySocket.MySocket("127.0.0.1", 20001)
-            self.data = json.loads('{"A": {"Vagas": {"1": 30, "2":30, "3":30} },"B": {"Vagas": {"1": 0, "2":30} }, "C": {"Vagas": {"1": 10, "2":10, "3":10} } }')
         
+        #self.sockCliente = MySocket.MySocket("127.0.0.1", 20000)
+        self.sockCliente = MySocket.MySocket("127.0.0.1", 20001)
         #self.sockCliente = MySocket.MySocket("127.0.0.1", 20002)
-        #self.data = json.loads('{"A": {"Vagas": {"1": 30, "2":30, "3":30} },"B": {"Vagas": {"1": 4, "2":30} }, "C": {"Vagas": {"1": 10, "2":10, "3":10} } }')
-        
         #self.sockCliente = MySocket.MySocket("127.0.0.1", 20003)
-        #self.data = json.loads('{"A": {"Vagas": {"1": 30, "2":30, "3":30} },"B": {"Vagas": {"1": 6, "2":30} }, "C": {"Vagas": {"1": 10, "2":10, "3":10} } }')
+        
+        self.data = json.loads('{"A": {"Vagas": {"1": 0, "2": 0, "3": 0} },"B": {"Vagas": {"1": 0, "2":0, "3":0} }, "C": {"Vagas": {"1": 0, "2": 0, "3":0} } }')
+        
 
         self.serverNumber = 1
         self.serverList = []
@@ -33,6 +29,11 @@ class Store:
 
     def setEncoder(self, encoder):
         self.enc = encoder
+
+    def setLotation(self, total):
+        self.data = total
+        print(self.data)
+        print(self.data["B"])
 
     def handleSlot(self, msg):
         building = msg["building"]
@@ -82,6 +83,7 @@ class Store:
         print(msg['Vagas'])
         return msg['Vagas']
 
+
     def handleServer(self, msg):
         building = msg["building"]
         layer = msg["layer"]
@@ -119,11 +121,35 @@ class Store:
         else:
             self.data[str(building)]['Vagas'][str(layer)] = qtd - 1
             print(self.data)
-            return "Authorized"
+            return "Authorized"    
+    '''
+    def handleServer(self, msg):
+        building = msg["building"]
+        layer = msg["layer"]
+        qtd = int(self.data[str(building)]['Vagas'][str(layer)])
 
+        if msg["client"] == "VISITOR":
+            if qtd > 0:
+                print("STORE AUTH")
+                self.data[str(building)]['Vagas'][str(layer)] = qtd - 1
+                print(self.data)
+                return "Authorized"
+            else:
+                print("Requesting slots...")
+                msg = {"type": "getSlot", "building": "B", "layer": 1}
+                for server in self.serverList:
+                    print(server)
+                    self.sockCliente.closeSocket()
+                    self.connect(server)
+                    self.sendMessage(msg)
+                    data = self.getMessage()
+                    print(data)
+        else:
+            self.data[str(building)]['Vagas'][str(layer)] = qtd - 1
+            print(self.data)
+            return "Authorized"
+    '''
     def connect(self, addr):
-        print("ADDR")
-        print(addr)
         self.sockCliente.createClientTCP()
         print("CRIADO SOCKET")
         self.sockCliente.connect(addr)

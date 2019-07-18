@@ -17,7 +17,7 @@ class Cliente:
         self.sock = None
         self.ip = "127.0.0.1"
         #self.ip = "172.31.93.40"
-        self.port = 9991
+        self.port = 9990
 
     def connect(self):
         self.serverAddr = self.getServerAddr()
@@ -44,7 +44,7 @@ class Cliente:
         return self.loadMessage(data)
 
     def makeRequest(self, data, passwdCode):
-        msg = {"type": "CLIENT", "building": "B", "layer": 1, "client": ENUM[int(passwdCode)]}
+        msg = {"type": "CLIENT", "building": data[0], "layer": data[1], "client": ENUM[int(passwdCode)]}
         self.sendTCP(self.prepareMsg(msg))
 
         return True

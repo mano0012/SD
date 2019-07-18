@@ -25,8 +25,6 @@ class MySocket:
         self.sock = socket.socket(socket.AF_INET,  # Internet
                                   socket.SOCK_STREAM)  # TCP
 
-        self.sock.bind((self.ip, self.port))
-
         return self.sock
 
 
@@ -36,6 +34,7 @@ class MySocket:
     def closeSocket(self):
         try:
             self.sock.close()
+            print("FECHOU")
         except:
             pass
 
