@@ -9,10 +9,7 @@ DNS_IP = "127.0.0.1"
 DNS_PORT = 10001
 MAX_LOTATION = 1
 
-class Users(Enum):
-    VISITOR = 0
-    FUNC = 1
-    ADMIN = 2
+ENUM = ["VISITOR", "FUNC", "ADMIN"]
 
 class Cliente:
     def __init__(self):
@@ -20,10 +17,21 @@ class Cliente:
         self.sock = None
         self.ip = "127.0.0.1"
         #self.ip = "172.31.93.40"
-        self.port = 9990
+        self.port = 9991
 
-    def validate(self, lock, passwdCode):
-        if self.makeRequest(lock,passwdCode):
+    def connect(self):
+        self.serverAddr = self.getServerAddr()
+            
+        self.closeSocket()
+        self.createSocketTCP()
+
+        self.sock.connect(self.serverAddr[0])
+        
+        return True
+    
+
+    def validate(self, data, passwdCode):
+        if self.makeRequest(data, passwdCode):
             if self.getResponse() == "Authorized":
                 return True
             return False
@@ -35,28 +43,14 @@ class Cliente:
 
         return self.loadMessage(data)
 
-    def makeRequest(self, lock, passwdCode):
-        if self.serverAddr == None:
-            self.serverAddr = self.getServerAddr()
-            
-            self.closeSocket()
-            self.createSocketTCP()
-
-            try:
-                self.sock.connect(self.serverAddr[0])
-            except:
-                print("NAO CONECTOU")
-                self.serverAddr = None
-                return False
-
-        msg = {"lockId": lock, "code": passwdCode}
-
+    def makeRequest(self, data, passwdCode):
+        msg = {"type": "CLIENT", "building": "B", "layer": 1, "client": ENUM[int(passwdCode)]}
         self.sendTCP(self.prepareMsg(msg))
 
         return True
 
     def sendTCP(self, serializedMsg):
-        self.sock.send(serializedMsg)
+        self.sock.sendall(serializedMsg)
 
     def createSocketTCP(self):
         self.sock = socket.socket(socket.AF_INET,

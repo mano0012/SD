@@ -85,7 +85,7 @@ class DNS:
         return self.serverList.get()
 
     def addQueueSv(self, host):
-        self.serverList.put(host)
+        self.serverList.put_nowait(host)
 
     def convertJson(self, message):
         try:

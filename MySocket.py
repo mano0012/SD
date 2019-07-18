@@ -6,8 +6,11 @@ class MySocket:
         self.ip = ip
         self.port = port
 
+    def getMessage(self):
+        return self.sock.recvfrom(2048)
+
     def sendTCP(self, serializedMsg):
-        self.sock.send(serializedMsg)
+        self.sock.sendall(serializedMsg)
 
     def createServerTCP(self):
         self.sock = socket.socket(socket.AF_INET,  # Internet
@@ -31,7 +34,6 @@ class MySocket:
         return self.sock.accept()
 
     def closeSocket(self):
-        print(socket.SHUT_RDWR)
         try:
             self.sock.close()
         except:
@@ -45,8 +47,7 @@ class MySocket:
 
         return self.sock
 
-    def connect(self, host, port):
-        server = (host, port)
+    def connect(self, server):
         self.sock.connect(server)
 
     def sendUDP(self, host, serializedMessage):

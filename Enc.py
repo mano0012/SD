@@ -24,7 +24,5 @@ class Enc:
 
     def prepareMsg(self, msg):
         jsonMsg = self.convertJson(msg)
-
         serializedMsg = pickle.dumps(jsonMsg)
-
         return serializedMsg
