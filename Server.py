@@ -17,8 +17,7 @@ TESTE = False
 
 class Server:
     def __init__(self):
-        self.extIp = "172.31.85.113"
-        self.localIp = "127.0.0.1"
+        self.ip = "3.84.162.70"
 
         self.enc = Enc.Enc()
         self.store = Store.Store()
@@ -115,11 +114,8 @@ class Server:
 
 
     def register(self):
-        print("CHEGOU")
         if self.createSocketUDP():
-            
-            print("ENTROU")
-            sendMsg = {"type":"registerServer", "int": str(self.localIp), "ext":str(self.extIp), "port":str(self.port)}
+            sendMsg = {"type":"registerServer", "ip": str(self.ip), "port":str(self.port)}
             print(sendMsg)
             self.sendUDP((DNS_IP, DNS_PORT), self.enc.prepareMsg(sendMsg))
             data, _ = self.sock.recvfrom(1024)
@@ -134,7 +130,7 @@ class Server:
                 self.store.setLotation(totalSlots)
 
             for server in self.serverList:
-                msg = {"type": "Server", "ip": str(self.localIp), "port": str(self.port) }
+                msg = {"type": "Server", "ip": str(self.ip), "port": str(self.port) }
                 self.store.connect(server)
                 self.store.sendMessage(msg)
                 self.store.closeConnection()
@@ -149,7 +145,7 @@ class Server:
 
         #self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
-        self.sock.bind(('0.0.0.0', self.port))
+        self.sock.bind((self.ip, self.port))
         self.sock.listen(5)
 
     def closeSocket(self):
@@ -163,7 +159,7 @@ class Server:
             self.sock = socket.socket(socket.AF_INET,  # Internet
                                 socket.SOCK_DGRAM)
 
-            self.sock.bind(("0.0.0.0", self.port))
+            self.sock.bind((self.ip, self.port))
         except:
             return False
         

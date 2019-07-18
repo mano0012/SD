@@ -5,7 +5,7 @@ import socket
 import json
 
 #DNS_IP = "172.31.88.8"
-DNS_IP = "3.222.165.1"
+DNS_IP = "3.216.185.57"
 DNS_PORT = 10000
 MAX_LOTATION = 1
 
@@ -26,7 +26,7 @@ class Cliente:
         self.createSocketTCP()
 
         self.sock.connect(self.serverAddr[0])
-        
+        print("Conectado ao servidor " + str(self.serverAddr[0]))
         return True
     
 
