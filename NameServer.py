@@ -10,15 +10,13 @@ THREAD_BLOCK = 10
 
 class DNS:
     def __init__(self):
-        #self.ip = "172.31.88.8"
-        self.ip = "127.0.0.1"
-        self.port = 10001
+        self.port = 10000
         self.enc = Enc.Enc()
         self.lock = False
         # Socket UDP
         self.s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-        self.s.bind((self.ip, self.port))
+        self.s.bind(("0.0.0.0", self.port))
         self.servers = []
         self.serverList = queue.Queue()
 

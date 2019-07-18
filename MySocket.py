@@ -1,9 +1,8 @@
 import socket
 import Enc
 class MySocket:
-    def __init__(self, ip, port):
+    def __init__(self, port):
         self.sock = None
-        self.ip = ip
         self.port = port
 
     def getMessage(self):
@@ -16,7 +15,7 @@ class MySocket:
         self.sock = socket.socket(socket.AF_INET,  # Internet
                                   socket.SOCK_STREAM)  # TCP
 
-        self.sock.bind((self.ip, self.port))
+        self.sock.bind(("0.0.0.0", self.port))
         self.sock.listen(5)
 
         return self.sock
@@ -42,7 +41,7 @@ class MySocket:
         self.sock = socket.socket(socket.AF_INET,  # Internet
                             socket.SOCK_DGRAM)
 
-        self.sock.bind((self.ip, self.port))
+        self.sock.bind(("0.0.0.0", self.port))
 
         return self.sock
 
