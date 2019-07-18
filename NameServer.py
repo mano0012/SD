@@ -34,18 +34,24 @@ class DNS:
             data, addr = self.s.recvfrom(1024)
 
             t = self.threads.getThread([data, addr])
-
+            print(addr)
             t.start()
 
-    def handleServer(self, addr):
+    def handleServer(self, addr, msg):
         while(True):
             if(self.lock == False):
                 break
 
         self.lock = True
 
-        self.addQueueSv(addr)
-        self.servers.append(addr)
+        print("LOCAL")
+        print(msg["int"])
+        
+        print("ext")
+        print(msg["ext"])
+
+        self.addQueueSv((msg["ext"], int(msg["port"])))
+        self.servers.append((msg["int"], int(msg["port"])))
 
         self.sendToHost(addr, self.servers)
 
@@ -54,16 +60,16 @@ class DNS:
     #Terminar getAddress
     def getAddress(self, data, addr):
         message = self.loadMessage(data)
-        
-        print("MESSAGE: " + message)
 
-        if message == "registerServer":
+        print("MESSAGE: " + str(message))
+
+        if message["type"] == "registerServer":
             print("Adding ", addr, " server.")
-            self.handleServer(addr)
-        elif message == "getServerList":
+            self.handleServer(addr, message)
+        elif message["type"] == "getServerList":
             serverList = pickle.dumps(list(self.serverList.queue))
             self.s.sendto(serverList, addr)
-        elif message == "getSlots":
+        elif message["type"] == "getSlots":
             slots = self.enc.prepareMsg(self.totalSlots)
             self.s.sendto(slots, addr)
         else:

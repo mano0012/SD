@@ -21,7 +21,7 @@ class Cliente:
 
     def connect(self):
         self.serverAddr = self.getServerAddr()
-            
+        print(self.serverAddr)
         self.closeSocket()
         self.createSocketTCP()
 
@@ -67,7 +67,7 @@ class Cliente:
     def getServerAddr(self):
         self.closeSocket()
         self.createSocketUDP()
-        self.sendUDP((DNS_IP, DNS_PORT), self.prepareMsg("requestServer"))
+        self.sendUDP((DNS_IP, DNS_PORT), self.prepareMsg({"type": "requestServer"}))
         data, _ = self.sock.recvfrom(1024)
         return [self.loadMessage(data)]
 
