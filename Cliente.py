@@ -5,7 +5,7 @@ import socket
 import json
 
 #DNS_IP = "172.31.88.8"
-DNS_IP = "3.83.15.206"
+DNS_IP = "3.216.185.57"
 DNS_PORT = 10000
 MAX_LOTATION = 1
 
