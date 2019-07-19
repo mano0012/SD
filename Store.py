@@ -6,9 +6,6 @@ import threadPool
 MAX_THREADS = 100
 THREAD_BLOCK = 10
 
-#TESTE = True
-TESTE = False
-
 class Store:
     def __init__(self):
         self.enc = None
@@ -21,7 +18,6 @@ class Store:
         self.serverNumber = 1
         self.serverList = []
 
-        #self.data = json.loads('{"A": {"Vagas": {"1": 30, "2":30, "3":30} },"B": {"Vagas": {"1": 6, "2":30} }, "C": {"Vagas": {"1": 10, "2":10, "3":10} } }')
         self.list = []
 
     def setEncoder(self, encoder):
@@ -29,8 +25,6 @@ class Store:
 
     def setLotation(self, total):
         self.data = total
-        print(self.data)
-        print(self.data["B"])
 
     def handleSlot(self, msg):
         building = msg["building"]
@@ -77,7 +71,6 @@ class Store:
         serializedMsg = self.sockCliente.getMessage()
         print(serializedMsg)
         msg = self.enc.loadMessage(serializedMsg[0])
-        print(msg['Vagas'])
         return msg['Vagas']
 
 
@@ -116,29 +109,11 @@ class Store:
                 else:
                     self.data[str(building)]['Vagas'][str(layer)] = qtd - 1
                     return "Authorized"
-                    
+
     def connect(self, addr):
         self.sockCliente.createClientTCP()
-        print("CRIADO SOCKET")
         self.sockCliente.connect(addr)
-
-    def doTrick(self):
-        print("Requesting slots...")
-        msg = {"type": "getSlot", "building": "B", "layer": 1}
-        for server in self.serverList:
-            print(server)
-            self.sockCliente.closeSocket()
-            self.connect(server)
-            self.sendMessage(msg)
-            data = self.getMessage()
-            print(data)
 
     def sendMessage(self, msg):
         self.sockCliente.sendTCP(self.enc.prepareMsg(msg))
 
-
-#FALTA FAZER A INTERAÇÃO ENTRE AS STORES E OS SERVIDORES
-#Funciona assim:
-#Servidor se conecta em uma store, solicita uma vaga, a store concede ou nega a vaga, servidor retorna para o cliente.
-#Começa com 1 store. Testa. Depois vai aumentando as stores.
-#De acordo com o aumento, as vagas devem ser divididas igualmente

@@ -12,9 +12,6 @@ THREAD_BLOCK = 10
 DNS_IP = "172.31.88.8"
 DNS_PORT = 10000
 
-#TESTE = True
-TESTE = False
-
 class Server:
     def __init__(self):
         self.ip = "3.84.162.70"
@@ -50,16 +47,7 @@ class Server:
 
     def handleSlots(self, msg):
         return self.store.handleSlot(msg)
-
-    '''
-    def addQueue(self, connection):
-        if self.criticalLock:
-            self.criticalQueue.put_nowait(connection)
-        else:
-            self.criticalLock = True
-            while self.criticalQueue.qsize() != 0:
-                con = self.criticalQueue.get()
-    '''   
+ 
     def run(self, connection):
         while True:
             try:
@@ -74,9 +62,7 @@ class Server:
                     self.handleServer(msg)
                     break
                 elif msg["type"] == "getSlot":
-                    print("FOI AKI")
                     qtd = self.handleSlots(msg)
-                    print('QTD: ', qtd)
                     connection.send(self.enc.prepareMsg(qtd))
                     break
                 else:
@@ -142,8 +128,6 @@ class Server:
     def createSocketTCP(self):
         self.sock = socket.socket(socket.AF_INET,  # Internet
                                   socket.SOCK_STREAM)  # TCP
-
-        #self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
         self.sock.bind((self.ip, self.port))
         self.sock.listen(5)

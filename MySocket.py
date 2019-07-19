@@ -33,7 +33,6 @@ class MySocket:
     def closeSocket(self):
         try:
             self.sock.close()
-            print("FECHOU")
         except:
             pass
 
