@@ -24,7 +24,7 @@ class DNS:
         self.threads = threadPool.tPool(self.getAddress, MAX_THREADS, THREAD_BLOCK)
 
 
-        self.totalSlots = {"A": {"Vagas": {"1": 10, "2":10, "3":10} },"B": {"Vagas": {"1": 10, "2":10, "3":10} }, "C": {"Vagas": {"1": 10, "2":10, "3":10} } }
+        self.totalSlots = {"A": {"Vagas": {"1": 1, "2":2, "3":3} },"B": {"Vagas": {"1": 5, "2":6, "3":7} }, "C": {"Vagas": {"1": 10, "2":11, "3":12} } }
 
         print("NameService is set up")
 

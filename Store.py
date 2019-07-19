@@ -86,66 +86,37 @@ class Store:
         layer = msg["layer"]
         qtd = int(self.data[str(building)]['Vagas'][str(layer)])
 
-        if msg["client"] == "VISITOR":
-            if qtd > 0:
-                print("STORE AUTH")
-                self.data[str(building)]['Vagas'][str(layer)] = qtd - 1
-                print(self.data)
-                return "Authorized"
-            else:
-                msg = {"type": "getSlot", "building": building, "layer": layer}
-                print("Requesting slots...")
-                for server in self.serverList:
-                    print(server)
-                    self.sockCliente.closeSocket()
-                    self.connect(server)
-                    print(msg)
-                    self.sendMessage(msg)
-                    data = self.getMessage()
-                    
-                    self.data[str(building)]['Vagas'][str(layer)] += int(data)
-
-                qtd = int(self.data[str(building)]['Vagas'][str(layer)])
-                
-                if qtd > 0:
-                    print("STORE AUTH")
-                    self.data[str(building)]['Vagas'][str(layer)] = qtd - 1
-                    print(self.data)
-                    return "Authorized"
-                else:
-                    print("STORE UNAUTH")
-                    return "Unauthorized"
-        else:
-            self.data[str(building)]['Vagas'][str(layer)] = qtd - 1
-            print(self.data)
-            return "Authorized"    
-    '''
-    def handleServer(self, msg):
-        building = msg["building"]
-        layer = msg["layer"]
-        qtd = int(self.data[str(building)]['Vagas'][str(layer)])
-
-        if msg["client"] == "VISITOR":
-            if qtd > 0:
-                print("STORE AUTH")
-                self.data[str(building)]['Vagas'][str(layer)] = qtd - 1
-                print(self.data)
-                return "Authorized"
-            else:
-                print("Requesting slots...")
-                msg = {"type": "getSlot", "building": "B", "layer": 1}
-                for server in self.serverList:
-                    print(server)
-                    self.sockCliente.closeSocket()
-                    self.connect(server)
-                    self.sendMessage(msg)
-                    data = self.getMessage()
-                    print(data)
-        else:
+        if qtd > 0:
             self.data[str(building)]['Vagas'][str(layer)] = qtd - 1
             print(self.data)
             return "Authorized"
-    '''
+        else:
+            msg = {"type": "getSlot", "building": building, "layer": layer}
+            print("Requesting slots...")
+            for server in self.serverList:
+                print(server)
+                self.sockCliente.closeSocket()
+                self.connect(server)
+                print(msg)
+                self.sendMessage(msg)
+                data = self.getMessage()
+                
+                self.data[str(building)]['Vagas'][str(layer)] += int(data)
+
+            qtd = int(self.data[str(building)]['Vagas'][str(layer)])
+            
+            if qtd > 0:
+                self.data[str(building)]['Vagas'][str(layer)] = qtd - 1
+                print(self.data)
+                return "Authorized"
+            else:
+                
+                if msg["client"] == "VISITOR":
+                    return "Unauthorized"
+                else:
+                    self.data[str(building)]['Vagas'][str(layer)] = qtd - 1
+                    return "Authorized"
+                    
     def connect(self, addr):
         self.sockCliente.createClientTCP()
         print("CRIADO SOCKET")

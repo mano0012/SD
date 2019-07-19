@@ -20,8 +20,9 @@ class Cliente:
         self.port = 9990
 
     def connect(self):
+        print("Fazendo solicitação ao servidor de nomes")
         self.serverAddr = self.getServerAddr()
-        print(self.serverAddr)
+        print("Endereço recebido: " + str(self.serverAddr))
         self.closeSocket()
         self.createSocketTCP()
 

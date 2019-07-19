@@ -24,7 +24,7 @@ class Server:
 
         self.store.setEncoder(self.enc)
 
-        self.port = 11001
+        self.port = 11000
 
         self.serverList = []
 
