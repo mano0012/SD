@@ -4,10 +4,8 @@ import pickle
 import socket
 import json
 
-#DNS_IP = "172.31.88.8"
-DNS_IP = "3.216.185.57"
+DNS_IP = "172.31.88.8"
 DNS_PORT = 10000
-MAX_LOTATION = 1
 
 ENUM = ["VISITOR", "FUNC", "ADMIN"]
 

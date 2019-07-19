@@ -10,7 +10,7 @@ THREAD_BLOCK = 10
 
 class DNS:
     def __init__(self):
-        self.ip = "127.0.0.1"
+        self.ip = "172.31.88.8"
         self.port = 10000
         self.enc = Enc.Enc()
         self.lock = False

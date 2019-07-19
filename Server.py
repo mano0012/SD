@@ -14,7 +14,7 @@ DNS_PORT = 10000
 
 class Server:
     def __init__(self):
-        self.ip = "3.84.162.70"
+        self.ip = "127.0.0.1"
 
         self.enc = Enc.Enc()
         self.store = Store.Store()
@@ -52,12 +52,10 @@ class Server:
         while True:
             try:
                 msg = self.getMessage(connection)
-            
+                print("MENSAGEM " + str(msg))
                 if msg["type"] == "Server":
                     self.handleServer(msg)
                     break
-
-                print("MENSAGEM " + str(msg))
                 if msg["type"] == "Server":
                     self.handleServer(msg)
                     break

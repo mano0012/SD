@@ -77,6 +77,7 @@ class Store:
     def handleServer(self, msg):
         building = msg["building"]
         layer = msg["layer"]
+        clientType = msg["client"]
         qtd = int(self.data[str(building)]['Vagas'][str(layer)])
 
         if qtd > 0:
@@ -103,8 +104,8 @@ class Store:
                 print(self.data)
                 return "Authorized"
             else:
-                
-                if msg["client"] == "VISITOR":
+                if clientType == "VISITOR":
+                    print("NAO AUTORIZADO")
                     return "Unauthorized"
                 else:
                     self.data[str(building)]['Vagas'][str(layer)] = qtd - 1
