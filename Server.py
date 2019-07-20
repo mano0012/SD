@@ -9,7 +9,8 @@ import Store
 
 MAX_THREADS = 100
 THREAD_BLOCK = 10
-DNS_IP = "172.31.88.8"
+#DNS_IP = "172.31.88.8"
+DNS_IP = "127.0.0.1"
 DNS_PORT = 10000
 
 class Server:
@@ -21,7 +22,7 @@ class Server:
 
         self.store.setEncoder(self.enc)
 
-        self.port = 11000
+        self.port = 11002
 
         self.serverList = []
 
@@ -34,6 +35,8 @@ class Server:
         self.closeSocket()
     
         self.createSocketTCP()
+
+        self.store.getLotation()
 
         print("Server is set up.")
         
@@ -50,27 +53,30 @@ class Server:
  
     def run(self, connection):
         while True:
-            try:
-                msg = self.getMessage(connection)
-                print("MENSAGEM " + str(msg))
-                if msg["type"] == "Server":
-                    self.handleServer(msg)
-                    break
-                if msg["type"] == "Server":
-                    self.handleServer(msg)
-                    break
-                elif msg["type"] == "getSlot":
-                    qtd = self.handleSlots(msg)
-                    connection.send(self.enc.prepareMsg(qtd))
-                    break
-                else:
-                    retorno = self.store.handleServer(msg)
-                    print(retorno)
-                    connection.sendall(self.enc.prepareMsg(retorno))
-            except:
-                print("END OF CONNECTION")
-                connection.shutdown(2)
-                connection.close()
+            #try:
+            msg = self.getMessage(connection)
+            print("MENSAGEM " + str(msg))
+            if msg["type"] == "Server":
+                self.handleServer(msg)
+                break
+            elif msg["type"] == "getSlot":
+                qtd = self.handleSlots(msg)
+                connection.send(self.enc.prepareMsg(qtd))
+                break
+            elif msg["type"] == "getLotation":
+                connection.send(self.enc.prepareMsg(self.store.getLotation()))
+            elif msg["type"] == "adminLotation":
+                connection.send(self.enc.prepareMsg(self.store.requestLotation()))
+            elif msg["type"] == "adminAddSlot":
+                connection.send(self.enc.prepareMsg(self.store.addSlots(msg)))
+            elif msg["type"] == "shutdown":
+                break
+            else:
+                retorno = self.store.handleServer(msg)
+                print(retorno)
+                connection.sendall(self.enc.prepareMsg(retorno))
+            #except:
+                pass
 
         connection.shutdown(2)
         connection.close()
