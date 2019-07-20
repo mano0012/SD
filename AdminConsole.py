@@ -3,16 +3,15 @@ import json
 import socket
 import pickle
 
-#DNS_IP = "172.31.88.8"
-DNS_IP = '127.0.0.1'
+DNS_IP = "172.31.88.8"
 DNS_PORT = 10000
 
 class Admin:
     def __init__(self):
         self.serverAddr = None
         self.sock = None
-        self.ip = "127.0.0.1"
-        self.port = 9997
+        self.ip = "172.31.93.40"
+        self.port = 8000
     
     def connect(self):
         print("Fazendo solicitação ao servidor de nomes")
