@@ -25,10 +25,10 @@ class Lock:
                 
                 msg = [building, layer]
 
-                if (self.c.validate(msg,  passwdCode)):
-                    print("Authorized")
+                if (self.c.validate(msg,  passwdCode)): 
+                    print("\nAutorizado\n")
                 else:
-                    print("Unauthorized")
+                    print("\nNão autorizado\n")
 
 
 Lock().run()

@@ -16,7 +16,7 @@ class Cliente:
         self.sock = None
         self.ip = "127.0.0.1"
         #self.ip = "172.31.93.40"
-        self.port = 9992
+        self.port = 9981
 
     def connect(self):
         print("Fazendo solicitação ao servidor de nomes")

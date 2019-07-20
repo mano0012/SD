@@ -24,7 +24,7 @@ class DNS:
         self.threads = threadPool.tPool(self.getAddress, MAX_THREADS, THREAD_BLOCK)
 
 
-        self.totalSlots = {"A": {"Vagas": {"1": 1, "2":2, "3":3} },"B": {"Vagas": {"1": 5, "2":6, "3":7} }, "C": {"Vagas": {"1": 10, "2":11, "3":12} } }
+        self.totalSlots = json.loads('{"A": {"Vagas": {"1": 1, "2": 2, "3": 3}, "Ocupado": {"1": 0, "2": 0, "3": 0} },"B": {"Vagas": {"1": 5, "2": 6, "3": 7}, "Ocupado": {"1": 0, "2": 0, "3": 0} }, "C": {"Vagas": {"1": 10, "2": 11, "3": 12}, "Ocupado": {"1": 0, "2": 0, "3": 0} } }')
 
         print("NameService is set up")
 
@@ -53,8 +53,6 @@ class DNS:
     #Terminar getAddress
     def getAddress(self, data, addr):
         message = self.loadMessage(data)
-
-        print("MESSAGE: " + str(message))
 
         if message["type"] == "registerServer":
             print("Adding ", addr, " server.")

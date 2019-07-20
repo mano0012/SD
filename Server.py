@@ -22,7 +22,7 @@ class Server:
 
         self.store.setEncoder(self.enc)
 
-        self.port = 11002
+        self.port = 11001
 
         self.serverList = []
 
@@ -41,7 +41,7 @@ class Server:
         print("Server is set up.")
         
     def handleServer(self, msg):
-        print("SERVER HANDLER")
+        print("Server Connected")
         ip = msg["ip"]
         port = int(msg["port"])
         address = (ip, port)
@@ -53,30 +53,34 @@ class Server:
  
     def run(self, connection):
         while True:
-            #try:
-            msg = self.getMessage(connection)
-            print("MENSAGEM " + str(msg))
-            if msg["type"] == "Server":
-                self.handleServer(msg)
-                break
-            elif msg["type"] == "getSlot":
-                qtd = self.handleSlots(msg)
-                connection.send(self.enc.prepareMsg(qtd))
-                break
-            elif msg["type"] == "getLotation":
-                connection.send(self.enc.prepareMsg(self.store.getLotation()))
-            elif msg["type"] == "adminLotation":
-                connection.send(self.enc.prepareMsg(self.store.requestLotation()))
-            elif msg["type"] == "adminAddSlot":
-                connection.send(self.enc.prepareMsg(self.store.addSlots(msg)))
-            elif msg["type"] == "shutdown":
-                break
-            else:
-                retorno = self.store.handleServer(msg)
-                print(retorno)
-                connection.sendall(self.enc.prepareMsg(retorno))
-            #except:
+            try:
+                msg = self.getMessage(connection)
+                if msg["type"] == "Server":
+                    self.handleServer(msg)
+                    break
+                elif msg["type"] == "getSlot":
+                    qtd = self.handleSlots(msg)
+                    connection.send(self.enc.prepareMsg(qtd))
+                    break
+                elif msg["type"] == "getLotation":
+                    connection.send(self.enc.prepareMsg(self.store.getLotation()))
+                elif msg["type"] == "adminLotation":
+                    connection.send(self.enc.prepareMsg(self.store.requestLotation()))
+                elif msg["type"] == "adminAddSlot":
+                    connection.send(self.enc.prepareMsg(self.store.addSlots(msg)))
+                elif msg["type"] == "shutdown":
+                    break
+                else:
+                    retorno = self.store.handleServer(msg)
+                    connection.sendall(self.enc.prepareMsg(retorno))
+            except:
                 pass
+
+        try:
+            msg = self.getMessage(connection)
+            #Força a o desativamento da conexão fazendo uma leitura em uma conexão já encerrada
+        except:
+            pass
 
         connection.shutdown(2)
         connection.close()
@@ -100,13 +104,10 @@ class Server:
     def verifyClient(self, data, address):
         message = self.enc.loadMessage(data)
 
-        print(message)
-
 
     def register(self):
         if self.createSocketUDP():
             sendMsg = {"type":"registerServer", "ip": str(self.ip), "port":str(self.port)}
-            print(sendMsg)
             self.sendUDP((DNS_IP, DNS_PORT), self.enc.prepareMsg(sendMsg))
             data, _ = self.sock.recvfrom(1024)
             message = self.enc.loadMessage(data)

@@ -12,7 +12,7 @@ class Admin:
         self.serverAddr = None
         self.sock = None
         self.ip = "127.0.0.1"
-        self.port = 9991
+        self.port = 9997
     
     def connect(self):
         print("Fazendo solicitação ao servidor de nomes")
@@ -29,12 +29,21 @@ class Admin:
         if self.connect():
             option = -1
             while option != '0':
-                option = input("1- Verificar Lotação\n2- Adicionar Vagas\n0- Sair\n Select: ")
+                option = input("1- Verificar Lotação\n2- Adicionar Vagas\n0- Sair\nSelecione a opção: ")
                 
                 if option=='1':
                     msg = {"type": "adminLotation"}
                     self.sendTCP(self.prepareMsg(msg))
-                    print(self.getResponse())
+                    lotation = self.getResponse()
+                    print("\nLA = Lotação atual")
+                    print("LM = Lotação máxima")
+                    print("===========================")
+                    print("Predio\tAndar\tLA/LM")
+                    for building in lotation:
+                        for layer in lotation[building]['Vagas']:
+                            total = int(lotation[str(building)]['Ocupado'][str(layer)]) + int(lotation[str(building)]['Vagas'][str(layer)])
+                            print(str(building) + '\t' + str(layer) + '\t' + str(lotation[building]['Ocupado'][layer]) + '/' + str(total))
+                    print("===========================")
                 elif option=='2':
                     building = input("Selecione o prédio (A, B ou C): ")
 
@@ -50,7 +59,10 @@ class Admin:
                     
                     msg = {"type": "adminAddSlot", "building": building, "layer": layer, "slots": slots}
                     self.sendTCP(self.prepareMsg(msg))
-                    print(self.getResponse())
+                    
+                    print('\n' + self.getResponse()+'\n')
+
+        self.sendTCP(self.prepareMsg({"type": "shutdown"}))
 
     def getServerAddr(self):
         self.closeSocket()

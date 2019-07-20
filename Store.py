@@ -11,12 +11,9 @@ class Store:
     def __init__(self):
         self.enc = None
         
-        self.sockCliente = MySocket.MySocket(20002)
+        self.sockCliente = MySocket.MySocket(20001)
         
-        self.data = json.loads('{"A": {"Vagas": {"1": 0, "2": 0, "3": 0} },"B": {"Vagas": {"1": 0, "2":0, "3":0} }, "C": {"Vagas": {"1": 0, "2": 0, "3":0} } }')
-        self.dataOcupado = json.loads('{"A": {"Ocupado": {"1": 0, "2": 0, "3": 0} },"B": {"Ocupado": {"1": 0, "2":0, "3":0} }, "C": {"Ocupado": {"1": 0, "2": 0, "3":0} } }')
-        
-
+        self.data = json.loads('{"A": {"Vagas": {"1": 0, "2": 0, "3": 0}, "Ocupado": {"1": 0, "2": 0, "3": 0} },"B": {"Vagas": {"1": 0, "2":0, "3":0}, "Ocupado": {"1": 0, "2": 0, "3": 0} }, "C": {"Vagas": {"1": 0, "2": 0, "3":0}, "Ocupado": {"1": 0, "2": 0, "3": 0} } }')
         self.serverNumber = 1
         self.serverList = []
 
@@ -63,13 +60,9 @@ class Store:
         self.serverList = serverList
         self.serverNumber = len(serverList) + 1
 
-    def getMessage(self, lotationType = "Vagas"):
+    def getMessage(self):
         serializedMsg = self.sockCliente.getMessage()
-        print(serializedMsg)
         msg = self.enc.loadMessage(serializedMsg[0])
-
-        if(lotationType == 'Vagas'):
-            return msg[lotationType]
         
         return msg
 
@@ -78,12 +71,11 @@ class Store:
         layer = msg["layer"]
         clientType = msg["client"]
         qtd = int(self.data[str(building)]['Vagas'][str(layer)])
-        qtdOcupado = int(self.dataOcupado[str(building)]['Ocupado'][str(layer)])
+        qtdOcupado = int(self.data[str(building)]['Ocupado'][str(layer)])
 
         if qtd > 0:
             self.data[str(building)]['Vagas'][str(layer)] = qtd - 1
-            self.dataOcupado[str(building)]['Ocupado'][str(layer)] = qtdOcupado + 1
-            print(self.data)
+            self.data[str(building)]['Ocupado'][str(layer)] = qtdOcupado + 1
             return "Authorized"
         else:
             msg = {"type": "getSlot", "building": building, "layer": layer}
@@ -92,54 +84,50 @@ class Store:
                 print(server)
                 self.sockCliente.closeSocket()
                 self.connect(server)
-                print(msg)
                 self.sendMessage(msg)
                 data = self.getMessage()
+                print(data)
                 
-                self.data[str(building)]['Vagas'][str(layer)] += int(data)
+                self.data[str(building)]['Vagas'][str(layer)] += int(data["Vagas"])
 
             qtd = int(self.data[str(building)]['Vagas'][str(layer)])
             
             if qtd > 0:
                 self.data[str(building)]['Vagas'][str(layer)] = qtd - 1
-                self.dataOcupado[str(building)]['Ocupado'][str(layer)] = qtdOcupado + 1
-                print(self.data)
+                self.data[str(building)]['Ocupado'][str(layer)] = qtdOcupado + 1
                 return "Authorized"
             else:
                 if clientType == "VISITOR":
-                    print("NAO AUTORIZADO")
                     return "Unauthorized"
                 else:
                     self.data[str(building)]['Vagas'][str(layer)] = qtd - 1
-                    self.dataOcupado[str(building)]['Ocupado'][str(layer)] = qtdOcupado + 1
+                    self.data[str(building)]['Ocupado'][str(layer)] = qtdOcupado + 1
                     return "Authorized"
 
     def requestLotation(self):
         msg = {"type": "getLotation"}
-        lotation = copy.deepcopy(self.dataOcupado)
-        free = copy.deepcopy(self.data)
+        lotation = copy.deepcopy(self.data)
 
         for server in self.serverList:
             self.sockCliente.closeSocket()
             self.connect(server)
             self.sendMessage(msg)
-            data = self.getMessage("Ocupado")
-            print(data)
-            for buildings in self.dataOcupado:
-                for layer in self.dataOcupado[str(buildings)]["Ocupado"]:
+            data = self.getMessage()
+            for buildings in self.data:
+                for layer in self.data[str(buildings)]["Ocupado"]:
                     qtd = int(lotation[str(buildings)]["Ocupado"][str(layer)])
-                    freeSlots = int(free[str(buildings)]["Vagas"][str(layer)])
+                    freeSlots = int(lotation[str(buildings)]["Vagas"][str(layer)])
 
-                    freeSlots += int(data[0][str(buildings)]["Vagas"][str(layer)])
-                    qtd += int(data[1][str(buildings)]["Ocupado"][str(layer)]) 
+                    freeSlots += int(data[str(buildings)]["Vagas"][str(layer)])
+                    qtd += int(data[str(buildings)]["Ocupado"][str(layer)]) 
 
                     lotation[str(buildings)]["Ocupado"][str(layer)] = qtd
-                    free[str(buildings)]["Vagas"][str(layer)] = qtd
+                    lotation[str(buildings)]["Vagas"][str(layer)] = freeSlots
         
-        return [lotation, free]
+        return lotation
     
     def getLotation(self):
-        return [self.data, self.dataOcupado]
+        return self.data
 
     def addSlots(self, msg):
         building = msg["building"]
