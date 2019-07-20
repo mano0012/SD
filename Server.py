@@ -9,20 +9,19 @@ import Store
 
 MAX_THREADS = 100
 THREAD_BLOCK = 10
-#DNS_IP = "172.31.88.8"
-DNS_IP = "127.0.0.1"
+DNS_IP = "172.31.88.8"
 DNS_PORT = 10000
 
 class Server:
     def __init__(self):
-        self.ip = "127.0.0.1"
+        self.ip = "172.31.85.113"
 
         self.enc = Enc.Enc()
         self.store = Store.Store()
 
         self.store.setEncoder(self.enc)
 
-        self.port = 11001
+        self.port = 11000
 
         self.serverList = []
 

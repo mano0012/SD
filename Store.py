@@ -11,7 +11,7 @@ class Store:
     def __init__(self):
         self.enc = None
         
-        self.sockCliente = MySocket.MySocket(20001)
+        self.sockCliente = MySocket.MySocket(20000)
         
         self.data = json.loads('{"A": {"Vagas": {"1": 0, "2": 0, "3": 0}, "Ocupado": {"1": 0, "2": 0, "3": 0} },"B": {"Vagas": {"1": 0, "2":0, "3":0}, "Ocupado": {"1": 0, "2": 0, "3": 0} }, "C": {"Vagas": {"1": 0, "2": 0, "3":0}, "Ocupado": {"1": 0, "2": 0, "3": 0} } }')
         self.serverNumber = 1
